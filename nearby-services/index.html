@@ -1,141 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NearFind — Nearby Services</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NearMe — Nearby Services Finder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
-    <div class="app-shell">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="brand">
-                <div class="brand-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                </div>
-                <span class="brand-name">NearFind</span>
-            </div>
 
-            <div class="locate-section">
-                <button id="locateBtn" class="locate-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
-                    <span class="btn-text">Detect My Location</span>
-                </button>
+  <!-- ── HEADER ── -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">◎</span>
+        <span class="logo-text">NearMe</span>
+      </div>
+      <p class="tagline">Free · Open · No API Keys · Powered by OpenStreetMap</p>
+    </div>
+    <div class="header-grid-lines"></div>
+  </header>
 
-                <div class="radius-control">
-                    <label>Search Radius</label>
-                    <div class="radius-options">
-                        <button class="radius-btn" data-value="500">500m</button>
-                        <button class="radius-btn active" data-value="1000">1 km</button>
-                        <button class="radius-btn" data-value="2000">2 km</button>
-                        <button class="radius-btn" data-value="5000">5 km</button>
-                    </div>
-                </div>
-            </div>
+  <!-- ── CONTROLS ── -->
+  <section class="controls-bar">
+    <div class="controls-inner">
 
-            <div class="categories-section">
-                <div class="section-label">Categories</div>
-                <div class="category-list">
-                    <button class="cat-btn active" data-category="all">
-                        <span class="cat-icon">◈</span>
-                        <span>All Places</span>
-                        <span class="cat-count" id="count-all">—</span>
-                    </button>
-                    <button class="cat-btn" data-category="hospital">
-                        <span class="cat-icon">✚</span>
-                        <span>Hospitals</span>
-                        <span class="cat-count" id="count-hospital">—</span>
-                    </button>
-                    <button class="cat-btn" data-category="restaurant">
-                        <span class="cat-icon">◉</span>
-                        <span>Restaurants</span>
-                        <span class="cat-count" id="count-restaurant">—</span>
-                    </button>
-                    <button class="cat-btn" data-category="fuel">
-                        <span class="cat-icon">◈</span>
-                        <span>Petrol Pumps</span>
-                        <span class="cat-count" id="count-fuel">—</span>
-                    </button>
-                    <button class="cat-btn" data-category="pharmacy">
-                        <span class="cat-icon">✦</span>
-                        <span>Medical Stores</span>
-                        <span class="cat-count" id="count-pharmacy">—</span>
-                    </button>
-                    <button class="cat-btn" data-category="shop">
-                        <span class="cat-icon">□</span>
-                        <span>Shops</span>
-                        <span class="cat-count" id="count-shop">—</span>
-                    </button>
-                    <button class="cat-btn" data-category="atm">
-                        <span class="cat-icon">$</span>
-                        <span>ATMs / Banks</span>
-                        <span class="cat-count" id="count-atm">—</span>
-                    </button>
-                    <button class="cat-btn" data-category="school">
-                        <span class="cat-icon">◎</span>
-                        <span>Schools</span>
-                        <span class="cat-count" id="count-school">—</span>
-                    </button>
-                </div>
-            </div>
+      <button id="locateBtn" class="locate-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>
+          <line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/>
+          <line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/>
+        </svg>
+        <span class="btn-label">Locate Me</span>
+      </button>
 
-            <div class="info-box">
-                <div class="info-title">Powered by</div>
-                <div class="info-items">
-                    <span>OpenStreetMap</span>
-                    <span>Overpass API</span>
-                    <span>Leaflet.js</span>
-                </div>
-                <div class="info-note">100% Free · No API Key</div>
-            </div>
-        </aside>
+      <div class="radius-control">
+        <label for="radiusSlider">Radius</label>
+        <input type="range" id="radiusSlider" min="500" max="10000" step="500" value="2000" />
+        <span id="radiusDisplay" class="radius-val">2 km</span>
+      </div>
 
-        <!-- Main content -->
-        <main class="main">
-            <!-- Status bar -->
-            <div id="statusBar" class="status-bar hidden">
-                <div class="status-inner">
-                    <div class="status-icon" id="statusIcon"></div>
-                    <span id="statusText"></span>
-                </div>
-            </div>
-
-            <!-- Map -->
-            <div id="map"></div>
-
-            <!-- Results drawer -->
-            <div class="results-drawer" id="resultsDrawer">
-                <div class="drawer-header">
-                    <div class="drawer-title">
-                        <span id="drawerTitle">Nearby Places</span>
-                        <span class="result-count" id="resultCount">0 found</span>
-                    </div>
-                    <button class="drawer-toggle" id="drawerToggle">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
-                    </button>
-                </div>
-                <div class="drawer-body" id="drawerBody">
-                    <div class="empty-state" id="emptyState">
-                        <div class="empty-icon">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                        </div>
-                        <p>Click <strong>Detect My Location</strong> to find nearby services</p>
-                    </div>
-                    <div class="results-grid" id="resultsList"></div>
-                </div>
-            </div>
-        </main>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="js/categories.js"></script>
-    <script src="js/overpass.js"></script>
-    <script src="js/map.js"></script>
-    <script src="js/app.js"></script>
+    <!-- Category chips -->
+    <div class="categories-strip" id="categoriesStrip">
+      {% for key, cat in categories.items() %}
+      <button class="chip {% if key == 'all' %}chip--active{% endif %}"
+              data-category="{{ key }}"
+              style="--chip-color: {{ cat.color }}">
+        <span class="chip-icon">{{ cat.icon }}</span>
+        <span class="chip-label">{{ cat.name }}</span>
+      </button>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- ── STATUS BAR ── -->
+  <div id="statusBar" class="status-bar status-idle">
+    <span id="statusText">Click "Locate Me" to discover what's around you</span>
+    <span id="statusCount" class="status-count"></span>
+  </div>
+
+  <!-- ── MAIN LAYOUT ── -->
+  <main class="main">
+
+    <!-- Map -->
+    <div class="map-wrap">
+      <div id="map"></div>
+      <!-- Crosshair overlay -->
+      <div class="map-overlay-hint" id="mapHint">
+        <div class="pulse-ring"></div>
+        <span>Awaiting location…</span>
+      </div>
+    </div>
+
+    <!-- Results panel -->
+    <aside class="results-panel">
+      <div class="panel-head">
+        <h2>Nearby Places</h2>
+        <span id="resultCount" class="count-badge">0</span>
+      </div>
+      <div id="resultsList" class="results-list">
+        <div class="empty-state">
+          <div class="empty-icon">📡</div>
+          <p>No results yet.</p>
+          <small>Enable location & hit "Locate Me"</small>
+        </div>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- ── ARCHITECTURE MODAL ── -->
+  <button class="arch-btn" id="archBtn" title="View Architecture">⚙ Architecture</button>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <button class="modal-close" id="modalClose">✕</button>
+      <h2>System Architecture</h2>
+      <div class="arch-diagram">
+        <div class="arch-step">
+          <div class="arch-step-icon">📱</div>
+          <div class="arch-step-label">Browser Geolocation API</div>
+          <div class="arch-step-desc">Native GPS — no permission store needed</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-step">
+          <div class="arch-step-icon">🐍</div>
+          <div class="arch-step-label">Flask Backend</div>
+          <div class="arch-step-desc">Python server with 5-min in-memory cache</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-step">
+          <div class="arch-step-icon">🗄️</div>
+          <div class="arch-step-label">Overpass API</div>
+          <div class="arch-step-desc">Free OSM query engine — 3 mirror endpoints</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-step">
+          <div class="arch-step-icon">🗺️</div>
+          <div class="arch-step-label">Leaflet + OSM Tiles</div>
+          <div class="arch-step-desc">100% free, open-source map rendering</div>
+        </div>
+      </div>
+      <div class="arch-table">
+        <table>
+          <thead><tr><th>Component</th><th>Technology</th><th>Cost</th></tr></thead>
+          <tbody>
+            <tr><td>Backend</td><td>Python Flask</td><td>Free</td></tr>
+            <tr><td>Map Tiles</td><td>OpenStreetMap</td><td>Free</td></tr>
+            <tr><td>POI Data</td><td>Overpass API</td><td>Free</td></tr>
+            <tr><td>Map Library</td><td>Leaflet.js</td><td>Free (BSD)</td></tr>
+            <tr><td>Geocoding</td><td>Nominatim</td><td>Free</td></tr>
+            <tr><td>Hosting</td><td>Vercel / Render</td><td>Free tier</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
