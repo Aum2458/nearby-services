@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NearMe — Nearby Services Finder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">◎</span>
+        <span class="logo-text">NearMe</span>
+      </div>
+      <p class="tagline">Free · Open · No API Keys · Powered by OpenStreetMap</p>
+    </div>
+    <div class="header-grid-lines"></div>
+  </header>
+
+  <!-- ── CONTROLS ── -->
+  <section class="controls-bar">
+    <div class="controls-inner">
+
+      <button id="locateBtn" class="locate-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>
+          <line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/>
+          <line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/>
+        </svg>
+        <span class="btn-label">Locate Me</span>
+      </button>
+
+      <div class="radius-control">
+        <label for="radiusSlider">Radius</label>
+        <input type="range" id="radiusSlider" min="500" max="10000" step="500" value="2000" />
+        <span id="radiusDisplay" class="radius-val">2 km</span>
+      </div>
+
+    </div>
+
+    <!-- Category chips -->
+    <div class="categories-strip" id="categoriesStrip">
+      {% for key, cat in categories.items() %}
+      <button class="chip {% if key == 'all' %}chip--active{% endif %}"
+              data-category="{{ key }}"
+              style="--chip-color: {{ cat.color }}">
+        <span class="chip-icon">{{ cat.icon }}</span>
+        <span class="chip-label">{{ cat.name }}</span>
+      </button>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- ── STATUS BAR ── -->
+  <div id="statusBar" class="status-bar status-idle">
+    <span id="statusText">Click "Locate Me" to discover what's around you</span>
+    <span id="statusCount" class="status-count"></span>
+  </div>
+
+  <!-- ── MAIN LAYOUT ── -->
+  <main class="main">
+
+    <!-- Map -->
+    <div class="map-wrap">
+      <div id="map"></div>
+      <!-- Crosshair overlay -->
+      <div class="map-overlay-hint" id="mapHint">
+        <div class="pulse-ring"></div>
+        <span>Awaiting location…</span>
+      </div>
+    </div>
+
+    <!-- Results panel -->
+    <aside class="results-panel">
+      <div class="panel-head">
+        <h2>Nearby Places</h2>
+        <span id="resultCount" class="count-badge">0</span>
+      </div>
+      <div id="resultsList" class="results-list">
+        <div class="empty-state">
+          <div class="empty-icon">📡</div>
+          <p>No results yet.</p>
+          <small>Enable location & hit "Locate Me"</small>
+        </div>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- ── ARCHITECTURE MODAL ── -->
+  <button class="arch-btn" id="archBtn" title="View Architecture">⚙ Architecture</button>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <button class="modal-close" id="modalClose">✕</button>
+      <h2>System Architecture</h2>
+      <div class="arch-diagram">
+        <div class="arch-step">
+          <div class="arch-step-icon">📱</div>
+          <div class="arch-step-label">Browser Geolocation API</div>
+          <div class="arch-step-desc">Native GPS — no permission store needed</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-step">
+          <div class="arch-step-icon">🐍</div>
+          <div class="arch-step-label">Flask Backend</div>
+          <div class="arch-step-desc">Python server with 5-min in-memory cache</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-step">
+          <div class="arch-step-icon">🗄️</div>
+          <div class="arch-step-label">Overpass API</div>
+          <div class="arch-step-desc">Free OSM query engine — 3 mirror endpoints</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-step">
+          <div class="arch-step-icon">🗺️</div>
+          <div class="arch-step-label">Leaflet + OSM Tiles</div>
+          <div class="arch-step-desc">100% free, open-source map rendering</div>
+        </div>
+      </div>
+      <div class="arch-table">
+        <table>
+          <thead><tr><th>Component</th><th>Technology</th><th>Cost</th></tr></thead>
+          <tbody>
+            <tr><td>Backend</td><td>Python Flask</td><td>Free</td></tr>
+            <tr><td>Map Tiles</td><td>OpenStreetMap</td><td>Free</td></tr>
+            <tr><td>POI Data</td><td>Overpass API</td><td>Free</td></tr>
+            <tr><td>Map Library</td><td>Leaflet.js</td><td>Free (BSD)</td></tr>
+            <tr><td>Geocoding</td><td>Nominatim</td><td>Free</td></tr>
+            <tr><td>Hosting</td><td>Vercel / Render</td><td>Free tier</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
